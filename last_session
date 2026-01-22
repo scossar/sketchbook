@@ -1,6 +1,12 @@
 let SessionLoad = 1
 let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1
 let v:this_session=expand("<sfile>:p")
+let Lf_StlColorscheme = "everforest"
+let VM_Insert_hl = "VMCursor"
+let Lf_PopupColorscheme = "everforest"
+let VM_Mono_hl = "VMCursor"
+let VM_Cursor_hl = "VMCursor"
+let VM_Extend_hl = "Visual"
 silent only
 silent tabonly
 cd ~/sketchbook
@@ -13,7 +19,7 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +15 ~/sketchbook/mandlebrot/mandlebrot.pde
+badd +10 ~/sketchbook/mandlebrot/mandlebrot.pde
 badd +35 ~/sketchbook/complex_numbers/complex_numbers.pde
 argglobal
 %argdel
@@ -45,18 +51,19 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 15 - ((14 * winheight(0) + 17) / 35)
+let s:l = 10 - ((9 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 15
-normal! 028|
+keepjumps 10
+normal! 010|
 wincmd w
 argglobal
 if bufexists(fnamemodify("~/sketchbook/complex_numbers/complex_numbers.pde", ":p")) | buffer ~/sketchbook/complex_numbers/complex_numbers.pde | else | edit ~/sketchbook/complex_numbers/complex_numbers.pde | endif
 if &buftype ==# 'terminal'
   silent file ~/sketchbook/complex_numbers/complex_numbers.pde
 endif
+balt ~/sketchbook/mandlebrot/mandlebrot.pde
 setlocal foldmethod=expr
 setlocal foldexpr=v:lua.LazyVim.treesitter.foldexpr()
 setlocal foldmarker={{{,}}}
@@ -65,12 +72,12 @@ setlocal foldlevel=99
 setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldenable
-let s:l = 35 - ((28 * winheight(0) + 17) / 35)
+let s:l = 31 - ((30 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 35
-normal! 017|
+keepjumps 31
+normal! 035|
 wincmd w
 wincmd =
 tabnext 1
