@@ -32,7 +32,7 @@ class Complex {
       );
   }
 
-  float magnitide() {
+  float magnitude() {
     return sqrt(re*re + im*im);
   }
 }
