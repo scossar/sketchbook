@@ -94,7 +94,7 @@ popMatrix();
 
 pushMatrix();
 translate(0, -6);
-text("(0, 1)", 210, 3);
+text("(1, 0)", 210, 3);
 text("(-1, 0)", -240, 3);
 popMatrix();
 
@@ -110,4 +110,4 @@ popMatrix();
 
 popMatrix();
 
-// save("unit_circle_processing.png");
+save("unit_circle_processing.png");

@@ -1,8 +1,16 @@
-int rows = 1600;
-int cols = 1600;
+int rows = 2000;
+int cols = 2000;
 int[][] iterations = new int[cols][rows];
-float[] xDomain = linspace(-1.78999, -1.74, cols);
-float[] yDomain = linspace(-0.025, 0.025, rows );
+// float[] xDomain = linspace(-0.7485 + 0.001, -0.7475 + 0.001, cols);
+// float[] yDomain = linspace(0.097, 0.098, rows );
+// float[] xDomain = linspace(-0.753, -0.742, cols);
+// float[] yDomain = linspace(0.09, 0.1, rows );
+// float[] xDomain = linspace(-1.79 + 0.012, -1.77 + 0.012, cols);
+// float[] yDomain = linspace(-0.01, 0.01, rows );
+// float[] xDomain = linspace(-1.78999, -1.74, cols);
+// float[] yDomain = linspace(-0.025, 0.025, rows );
+float[] xDomain = linspace(-2.5, 1, cols);
+float[] yDomain = linspace(-1.75, 1.75, rows );
 
 color[] palette = {
   color(0, 2, 0),
@@ -13,7 +21,7 @@ color[] palette = {
 };
 
 void setup() {
-  size(800, 800);
+  size(1000, 1000);
   iterations = fillArray(xDomain, yDomain);
   background(235);
 }
@@ -24,14 +32,14 @@ void draw() {
       if (iterations[i][j] == 0) {
         stroke(25); // in the set
       } else { // map iterations with color
-        float hue = map(iterations[i][j], 1, 50, 169, 323);
+        float hue = map(iterations[i][j], 1, 100, 169, 360);
         colorMode(HSB, 360, 100, 100);
         stroke(hue, 57, 39);
       }
       point(i * 0.5, j * 0.5);
     }
   }
-  save("mandlebrot5.png");
+  save("mandelbrot.png");
   noLoop();
 }
 
@@ -43,8 +51,8 @@ int[][] fillArray(float[] xVals, float[] yVals) {
       Complex c = new Complex(xVals[i], yVals[j]);
       Complex z = new Complex(0, 0);
       boolean diverged = false;
-      for (int iter = 0; iter < 50; iter++) {
-        if (z.magnitude() >= 3) {
+      for (int iter = 0; iter < 100; iter++) {
+        if (z.magnitude() >= 2) {
           result[i][j] = iter;
           diverged = true;
           break;
