@@ -1,57 +1,34 @@
-int rows = 1000;
-int cols = 1000;
-int[][] iterations = new int[cols][rows];
-float[] xDomain = linspace(-0.7485 + 0.001, -0.7475 + 0.001, cols);
-float[] yDomain = linspace(0.097, 0.098, rows );
-// float[] xDomain = linspace(-0.753, -0.742, cols);
-// float[] yDomain = linspace(0.09, 0.1, rows );
-// float[] xDomain = linspace(-1.79 + 0.012, -1.77 + 0.012, cols);
-// float[] yDomain = linspace(-0.01, 0.01, rows );
-// float[] xDomain = linspace(-1.78999, -1.74, cols);
-// float[] yDomain = linspace(-0.025, 0.025, rows );
-// float[] xDomain = linspace(-2.5, 1, cols);
-// float[] yDomain = linspace(-1.75, 1.75, rows );
-int maxIterations = 0;
+int rows = 4000;
+int cols = 4000;
+int maxIters = 8000; // adjust, especially for zoomed in areas
+int maxIterColorCutoff = 7000;
+float pxScale = 0.25;  // allows for having 2x rows and columns than pixels, defaults to 1
 
-color[] palette = {
-  color(0, 2, 0),
-  color(0, 7, 100),
-  color(32, 107, 203),
-  color(237, 255, 255),
-  color(255, 170, 0),
-};
+int[][] iterations = new int[cols][rows];
+float[] realComponents = centeredLinspace(-0.7474475, 0.000025, cols);
+float[] imaginaryComponents = centeredLinspace(0.085984, 0.000025, rows);
 
 void setup() {
   size(1000, 1000);
-  iterations = fillArray(xDomain, yDomain);
-  // for (int i = 0; i < iterations[0].length; i++) {
-  //   for (int j = 0; j < iterations[1].length; j++) {
-  //     if (iterations[i][j] > maxIterations) {
-  //       maxIterations = iterations[i][j];
-  //     }
-  //   }
-  // }
-  println("MAX ITERATIONS: ", maxIterations);
-  background(235);
+  colorMode(HSB, 360, 100, 100);
+  iterations = fillArray(realComponents, imaginaryComponents);
 }
 
 void draw() {
   for (int i = 0; i < iterations[0].length; i++) {
     for (int j = 0; j < iterations[1].length; j++) {
       if (iterations[i][j] == 0) {
-        stroke(25); // in the set
-      } else if (iterations[i][j] > 500) {
-        colorMode(HSB, 360, 57, 79);
-        stroke(360, 100, 100);
-      } else { // map iterations with color
-        float hue = map(iterations[i][j], 1, 500, 167, 300);
-        colorMode(HSB, 360, 100, 100);
-        stroke(hue, 57, 79);
+        stroke(0, 0, 0); // in the Mandelbrot set
+      } else if (iterations[i][j] > maxIterColorCutoff) {  // probably on a boundary; adjust this value
+        stroke(360, 89, 79);
+      } else { // not in set and (probably) not on the boundary
+        float hue = map(iterations[i][j], 1, maxIterColorCutoff, 167, 360);
+        stroke(hue, 89, 79);
       }
-      point(i, j);
+      point(i*pxScale, j*pxScale);
     }
   }
-  save("mandelbrot.png");
+  save("mandelbrot_seahorse_valley_5.png");
   noLoop();
 }
 
@@ -63,7 +40,7 @@ int[][] fillArray(float[] xVals, float[] yVals) {
       Complex c = new Complex(xVals[i], yVals[j]);
       Complex z = new Complex(0, 0);
       boolean diverged = false;
-      for (int iter = 0; iter < 10000; iter++) {
+      for (int iter = 0; iter < maxIters; iter++) {
         if (z.magnitude() >= 2) {
           result[i][j] = iter;
           diverged = true;
@@ -81,13 +58,30 @@ int[][] fillArray(float[] xVals, float[] yVals) {
   return result;
 }
 
-
 float[] linspace(float start, float end, int num) {
   float[] result = new float[num];
   if (num == 1) {
     result[0] = start;
     return result;
   }
+  float step = (end - start) / (num - 1);
+  for (int i = 0; i < num; i++) {
+    result[i] = start + i * step;
+  }
+  return result;
+}
+
+float findCenter(float start, float end) {
+  float dif = end - start;
+  float halfDif = dif/2;
+  return start + halfDif;
+}
+
+float[] centeredLinspace(float center, float range, int num) {
+  float[] result = new float[num];
+  float halfRange = range * 0.5;
+  float start = center - halfRange;
+  float end = center + halfRange;
   float step = (end - start) / (num - 1);
   for (int i = 0; i < num; i++) {
     result[i] = start + i * step;
