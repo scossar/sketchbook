@@ -1,12 +1,12 @@
-int rows = 4000;
-int cols = 4000;
-int maxIters = 8000; // adjust, especially for zoomed in areas
-int maxIterColorCutoff = 7000;
-float pxScale = 0.25;  // allows for having 2x rows and columns than pixels, defaults to 1
+int rows = 1000;
+int cols = 1000;
+int maxIters = 700; // adjust, especially for zoomed in areas
+int maxIterColorCutoff = 700;
+float pxScale = 1;  // allows for having 2x rows and columns than pixels, defaults to 1
 
-int[][] iterations = new int[cols][rows];
-float[] realComponents = centeredLinspace(-0.7474475, 0.000025, cols);
-float[] imaginaryComponents = centeredLinspace(0.085984, 0.000025, rows);
+int[][] iterations = new int[rows][cols];
+float[] realComponents = centeredLinspace(-0.5, 3, cols);
+float[] imaginaryComponents = centeredLinspace(0, 3, rows);
 
 void setup() {
   size(1000, 1000);
@@ -28,16 +28,16 @@ void draw() {
       point(i*pxScale, j*pxScale);
     }
   }
-  save("mandelbrot_seahorse_valley_5.png");
+  save("full_set_rev_2.png");
   noLoop();
 }
 
-int[][] fillArray(float[] xVals, float[] yVals) {
+int[][] fillArray(float[] realVals, float[] imagVals) {
   int[][] result = new int[rows][cols];
 
-  for (int i = 0; i < xVals.length; i++) {
-    for (int j = 0; j < yVals.length; j++) {
-      Complex c = new Complex(xVals[i], yVals[j]);
+  for (int i = 0; i < imagVals.length; i++) {
+    for (int j = 0; j < realVals.length; j++) {
+      Complex c = new Complex(realVals[j], imagVals[i]);
       Complex z = new Complex(0, 0);
       boolean diverged = false;
       for (int iter = 0; iter < maxIters; iter++) {
@@ -82,6 +82,7 @@ float[] centeredLinspace(float center, float range, int num) {
   float halfRange = range * 0.5;
   float start = center - halfRange;
   float end = center + halfRange;
+  print("start: ", start, "end:", end);
   float step = (end - start) / (num - 1);
   for (int i = 0; i < num; i++) {
     result[i] = start + i * step;
