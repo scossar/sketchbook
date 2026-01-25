@@ -1,29 +1,23 @@
 int rows = 1000;
-int cols = 1000;
+int cols = 1200;
+float aspectRatio = (float)cols / rows; // width/height
 
-int maxIters = 32000; // adjust, especially for zoomed in areas
-int maxIterColorCutoff = 9000;
+int maxIters = 70; // adjust, especially for zoomed in areas
+int maxIterColorCutoff = 70;
+float pxScale = 1;  // allows for having 2x rows and columns than pixels, defaults to 1
 
 int[][] iterations = new int[rows][cols];
 
-// float aspect = 0.000375;
-float aspect = 0.00006;
-float halfAspect = aspect / 2;
-float centerReal = -0.747597;
-float centerImag = 0.09001;
-float startReal = centerReal - halfAspect;
-float endReal = centerReal + halfAspect;
-float startImag = centerImag + halfAspect;
-float endImag = centerImag - halfAspect;
-float[] imaginaryComponents = linspace(startImag, endImag, rows, "imaginary");
-float[] realComponents = linspace(startReal, endReal, cols, "real");
+float imaginaryRange = 2.5;
+float realRange = imaginaryRange * aspectRatio;
 
+float[] imaginaryComponents = linspace(1.25, -1.25, rows);
 
-// float[] imaginaryComponents = linspace(1.25*0.5, -1.25*0.5, rows, "imaginary");
-// float[] realComponents = linspace(-2.0*0.5 - 1, 0.5*0.5 - 1, cols, "real");
+float centerReal = -0.75;
+float[] realComponents = linspace(centerReal - realRange/2, centerReal + realRange/2, cols);
 
 void setup() {
-  size(1000, 1000); // cols, rows
+  size(1200, 1000); // cols, rows
   colorMode(HSB, 360, 100, 100);
   iterations = fillArray(imaginaryComponents, realComponents);
 }
@@ -32,18 +26,18 @@ void draw() {
   for (int i = 0; i < iterations.length; i++) {  // i indexes the imaginary axis
     for (int j = 0; j < iterations[i].length; j++) {  // j indexes the real axis
       if (iterations[i][j] == 0) {
-        // 0 means "(probably) in the Mandelbrot set"; these points iterated maxIters times without diverging
-        stroke(0, 0, 0);
-      } else { // not in set
-        // float hue = map(iterations[i][j], 1, maxIterColorCutoff, 167, 360);
-        // better approach for setting hue; compresses high values and spreads out low values:
-        float hue = map(log(iterations[i][j]), log(1), log(maxIterColorCutoff), 0, 360);
-        stroke(hue, 64, 87);
+        stroke(0, 0, 0); // in the Mandelbrot set
+        // a hack to prevent high outliers from compressing the color range:
+      } else if (iterations[i][j] > maxIterColorCutoff) {
+        stroke(360, 89, 79);
+      } else { // not in set and (probably) not on the boundary
+        float hue = map(iterations[i][j], 1, maxIterColorCutoff, 167, 360);
+        stroke(hue, 89, 79);
       }
-      point(j, i);
+      point(j*pxScale, i*pxScale);
     }
   }
-  save("mandelbrot_imp_seahorse_valley_zoom4.png");
+  save("fixed_set.png");
   noLoop();
 }
 
@@ -73,9 +67,7 @@ int[][] fillArray(float[] imagVals, float[] realVals) {
   return result;
 }
 
-float[] linspace(float start, float end, int num, String plane) {
-  println("start (" + plane + "):", start);
-  println("end: (" + plane + "):", end);
+float[] linspace(float start, float end, int num) {
   float[] result = new float[num];
   if (num == 1) {
     result[0] = start;
