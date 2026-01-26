@@ -47,6 +47,7 @@ def osc(address, *values):
 
 def mandelbrot(centerReal, centerImag):
     realDomain = np.linspace(centerReal - 0.1, centerReal + 0.1, 50)
+    # this is upside down
     imaginaryDomain = np.linspace(centerImag - 0.1, centerImag + 0.1, 50)
     iterations = np.zeros((50, 50), dtype=int)
     for i, imag in enumerate(imaginaryDomain):
