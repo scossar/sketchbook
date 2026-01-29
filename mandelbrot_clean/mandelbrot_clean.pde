@@ -1,16 +1,21 @@
 int rows = 1000;
 int cols = 1000;
 
-int maxIters = 32000; // adjust, especially for zoomed in areas
-int maxIterColorCutoff = 9000;
+int maxIters = 100000; // adjust, especially for zoomed in areas
+int maxIterColorCutoff = 1000;
 
 int[][] iterations = new int[rows][cols];
 
 // float aspect = 0.000375;
-float aspect = 0.00006;
+// float aspect = 0.00006;
+// float aspect = 0.000000000000000160;
+float aspect = 0.000002560;
+
 float halfAspect = aspect / 2;
-float centerReal = -0.747597;
-float centerImag = 0.09001;
+// float centerReal = -0.747597;
+float centerReal = -1.769110375463767385;
+// float centerImag = 0.09001;
+float centerImag = 0.009020388228023440;
 float startReal = centerReal - halfAspect;
 float endReal = centerReal + halfAspect;
 float startImag = centerImag + halfAspect;
@@ -37,13 +42,13 @@ void draw() {
       } else { // not in set
         // float hue = map(iterations[i][j], 1, maxIterColorCutoff, 167, 360);
         // better approach for setting hue; compresses high values and spreads out low values:
-        float hue = map(log(iterations[i][j]), log(1), log(maxIterColorCutoff), 0, 360);
+        float hue = map(log(iterations[i][j]), log(1), log(maxIterColorCutoff), 64, 360);
         stroke(hue, 64, 87);
       }
       point(j, i);
     }
   }
-  save("mandelbrot_imp_seahorse_valley_zoom4.png");
+  save("mandelbrot_test.png");
   noLoop();
 }
 
