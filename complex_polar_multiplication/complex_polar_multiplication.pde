@@ -9,6 +9,9 @@ ComplexPolar a, b, c;
 float windowScale;
 boolean clearBg = false;
 
+boolean closeBA, closeCA, closeCB = false;
+
+
 void setup() {
   size(600, 600);
   windowScale = width / 3;
@@ -20,6 +23,7 @@ void setup() {
   noFill();
   oscP5 = new OscP5(this, 12000);
   myLocation = new NetAddress("127.0.0.1", 9000);
+  println("mod test", -5.0 % 2);
 }
 
 void draw() {
@@ -30,30 +34,83 @@ void draw() {
 
   stroke(216, 15, 91);
   strokeWeight(1);
+  noFill();
   ellipse(0, 0, 1*windowScale, 1*windowScale);
   line(-width/2, 0, width/2, 0);
 
   if (a != null) {
-    float re = a.re * windowScale * 0.5;
-    float im = a.im * windowScale * 0.5;
+    float re = a.re() * windowScale * 0.5;
+    float im = a.im() * windowScale * 0.5;
     strokeWeight(8);
     stroke(a.hue, 74, 55);
     point(re, im);
+
+    pushMatrix();
+    scale(1, -1);
+    fill(0, 0, 0);
+    text("A", re + 10, -im);
+    text("Point 'A', r: " + a.r + " theta: " + a.theta, -width/2 + 10, -height/2 + 20);
+    popMatrix();
   }
   if (b != null) {
-    float re = b.re * windowScale * 0.5;
-    float im = b.im * windowScale * 0.5;
+    float re = b.re() * windowScale * 0.5;
+    float im = b.im() * windowScale * 0.5;
     strokeWeight(8);
     stroke(b.hue, 74, 55);
     point(re, im);
+
+    pushMatrix();
+    scale(1, -1);
+    String label = "B";
+    int labelOffset = 10;
+    if (closeBA) labelOffset += 12;
+    text(label, re + labelOffset, -im);
+
+    fill(0, 0, 0);
+    text("Point 'B', r: " + b.r + " theta: " + b.theta, -width/2 + 10, -height/2 + 42);
+    popMatrix();
   }
   if (c != null) {
-    float re = c.re * windowScale * 0.5;
-    float im = c.im * windowScale * 0.5;
+    float re = c.re() * windowScale * 0.5;
+    float im = c.im() * windowScale * 0.5;
     strokeWeight(8);
     stroke(c.hue, 74, 55);
     point(re, im);
+
+    pushMatrix();
+    scale(1, -1);
+    String label = "C";
+    int labelOffset = 10;
+    if (closeCA) labelOffset += 12;
+    if (closeCB) labelOffset += 12;
+    text(label, re + labelOffset, -im);
+    fill(0, 0, 0);
+    text("Point 'C', r: " + c.r + " theta: " + c.theta, -width/2 + 10, -height/2 + 64);
+    popMatrix();
   }
+
+  if (a != null && b != null) {
+    closeBA = isClose(b, a);
+    if (c != null) {
+      closeCA = isClose(c, a);
+      closeCB = isClose(c, b);
+    }
+  }
+}
+
+boolean isClose(ComplexPolar a, ComplexPolar b) {
+  float thetaA = normalizeTheta(a.theta);
+  float thetaB = normalizeTheta(b.theta);
+  if (abs(thetaA - thetaB) < PI/16 && abs(a.r - b.r) < 12) {
+    return true;
+  }
+  return false;
+}
+
+float normalizeTheta(float theta) {
+  float normalizedTheta = theta % TWO_PI;
+  if (normalizedTheta < 0) normalizedTheta += TWO_PI;
+  return normalizedTheta;
 }
 
 void oscEvent(OscMessage message) {
@@ -64,7 +121,6 @@ void oscEvent(OscMessage message) {
       float r = message.get(0).floatValue();
       float theta = message.get(1).floatValue();
       a = new ComplexPolar(r, theta);
-      print("a.re", a.re, "a.im", a.im);
     }
   }
 
@@ -117,30 +173,43 @@ void oscEvent(OscMessage message) {
 
 
 class ComplexPolar {
-  float r, theta, re, im;
+  float r, theta;
   int hue;
 
   ComplexPolar(float r, float theta) {
     this.r = r;
     this.theta = theta;
-    this.re = r * cos(theta);
-    this.im = r * sin(theta);
-    this.hue = (int)(theta * 180.0/PI) % 360;
+    float normalizedTheta = theta % TWO_PI;
+    if (normalizedTheta < 0) normalizedTheta += TWO_PI;
+    this.hue = (int)(normalizedTheta * 180/PI);
   }
 
   ComplexPolar mult(ComplexPolar other) {
     return new ComplexPolar(
-      r * other.r, cos(theta + other.theta) + sin(theta + other.theta)
+      r * other.r, theta + other.theta
       );
   }
 
   ComplexPolar sum(ComplexPolar other) {
+    float real = this.re() + other.re();
+    float imag = this.im() + other.im();
+    float magnitude = sqrt(real*real + imag*imag);
+    float theta = atan2(imag, real);
+
     return new ComplexPolar(
-      re + other.re, im + other.im
-    );
+      magnitude, theta
+      );
   }
 
   float magnitude() {
-    return sqrt(re*re + im*im);
+    return r;
+  }
+
+  float re() {
+    return r * cos(theta);
+  }
+
+  float im() {
+    return r * sin(theta);
   }
 }

@@ -1,19 +1,19 @@
 int rows = 1000;
 int cols = 1000;
 
-int maxIters = 100000; // adjust, especially for zoomed in areas
+int maxIters = 10000; // adjust, especially for zoomed in areas
 int maxIter = 0;
 int totalEscaped;
 
 int[][] iterations = new int[rows][cols];
 int[] cumulative;
 
-double aspect = 0.05;
+double aspect = 0.125 * 0.0000005;
 
 double halfAspect = aspect / 2;
 
-double centerReal = -0.5 + 0.25;
-double centerImag = 0.64;
+double centerReal = -0.49 - 0.10238635;
+double centerImag = 0.6 + 0.0175717182;
 // double centerReal = -1.769110375463767385;
 // double centerImag = 0.009020388228023440;
 
